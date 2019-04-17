@@ -75,4 +75,34 @@ public class RecommenderService {
 
         return recommendations;
     }
+
+    // user recs
+    public List<Recommendation> getCollaborativeFilteringRecommendations(UserRecommendationRequest request) {
+        MongoCollection<Document> userRecsCollection = mongoClient.getDatabase(Constant.MONGODB_DATABASE).getCollection(Constant.MONGODB_USER_RECS_COLLECTION);
+        Document document = userRecsCollection.find(new Document("userId", request.getUserId())).first();
+
+        List<Recommendation> recommendations = new ArrayList<>();
+        ArrayList<Document> recs = document.get("recs", ArrayList.class);
+
+        for (Document recDoc : recs) {
+            recommendations.add(new Recommendation(recDoc.getInteger("rid"), recDoc.getDouble("r")));
+        }
+
+        return recommendations;
+    }
+
+    // user stream recs
+    public List<Recommendation> getStreamRecommendations(UserRecommendationRequest request) {
+        MongoCollection<Document> userRecsCollection = mongoClient.getDatabase(Constant.MONGODB_DATABASE).getCollection(Constant.MONGODB_STREAM_RECS_COLLECTION);
+        Document document = userRecsCollection.find(new Document("userId", request.getUserId())).first();
+
+        List<Recommendation> recommendations = new ArrayList<>();
+        ArrayList<Document> recs = document.get("recs", ArrayList.class);
+
+        for (Document recDoc : recs) {
+            recommendations.add(new Recommendation(recDoc.getInteger("productId"), recDoc.getDouble("score")));
+        }
+
+        return recommendations;
+    }
 }

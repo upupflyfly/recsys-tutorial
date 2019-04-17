@@ -126,4 +126,26 @@ public class ProductRestApi {
         model.addAttribute("message"," 已完成评分！");
         return model;
     }
+
+    // 离线推荐
+    @RequestMapping(value = "/offline", produces = "application/json", method = RequestMethod.GET )
+    @ResponseBody
+    public Model getOfflineProducts(@RequestParam("username")String username,@RequestParam("num")int num, Model model) {
+        User user = userService.findByUsername(username);
+        List<Recommendation> recommendations = recommenderService.getCollaborativeFilteringRecommendations(new UserRecommendationRequest(user.getUserId(), num));
+        model.addAttribute("success",true);
+        model.addAttribute("products", productService.getRecommendProducts(recommendations));
+        return model;
+    }
+
+    // 实时推荐
+    @RequestMapping(value = "/stream", produces = "application/json", method = RequestMethod.GET )
+    @ResponseBody
+    public Model getStreamProducts(@RequestParam("username")String username,@RequestParam("num")int num, Model model) {
+        User user = userService.findByUsername(username);
+        List<Recommendation> recommendations = recommenderService.getStreamRecommendations(new UserRecommendationRequest(user.getUserId(), num));
+        model.addAttribute("success",true);
+        model.addAttribute("products", productService.getRecommendProducts(recommendations));
+        return model;
+    }
 }
